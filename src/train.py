@@ -26,13 +26,17 @@ def train():
     with mlflow.start_run() as run:
         pipeline.fit(X_train, y_train)
 
+        # ✅ Ensure 'models/' folder exists
+        os.makedirs("models", exist_ok=True)
+
         # Save model
         joblib.dump(pipeline, "models/model.joblib")
         mlflow.sklearn.log_model(pipeline, "model")
         mlflow.log_param("model_type", "LogisticRegression")
         mlflow.log_param("test_size", 0.2)
 
-        # Save test set for later evaluation
+        # Save test set for evaluation
+        os.makedirs("data/processed", exist_ok=True)
         X_test.to_csv("data/processed/X_test.csv", index=False)
         y_test.to_csv("data/processed/y_test.csv", index=False)
 
