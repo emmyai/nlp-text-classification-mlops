@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import re
 import string
@@ -24,5 +25,9 @@ if __name__ == "__main__":
     df = pd.read_csv("data/raw/nlp_text_classification_dataset_2000.csv")
     processor = TextPreprocessor()
     df["text"] = processor.transform(df["text"])
+
+    # Ensure the output directory exists
+    os.makedirs("data/processed", exist_ok=True)
+
     df.to_csv("data/processed/nlp_text_cleaned.csv", index=False)
     print("Text preprocessing complete and saved to 'nlp_text_cleaned.csv'")
