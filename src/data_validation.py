@@ -3,7 +3,7 @@ import sys
 
 if __name__ == "__main__":
     try:
-        df = pd.read_csv("../data/nlp_text_classification_dataset_2000.csv")
+        df = pd.read_csv("..data/raw/nlp_text_classification_dataset_2000.csv")
 
         # Basic checks
         assert not df.empty, "Dataset is empty."

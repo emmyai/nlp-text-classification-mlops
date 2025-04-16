@@ -2,13 +2,19 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import ManagedOnlineEndpoint, ManagedOnlineDeployment
 from azure.identity import DefaultAzureCredential
 import uuid
+import os
+
+# Load environment variables for Azure ML
+subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
+resource_group = os.environ["AZURE_RESOURCE_GROUP"]
+workspace_name = os.environ["AZURE_WORKSPACE_NAME"]
 
 # Azure ML client
 ml_client = MLClient(
     DefaultAzureCredential(),
-    subscription_id="<your-subscription-id>",
-    resource_group_name="<your-resource-group>",
-    workspace_name="<your-workspace-name>"
+    subscription_id=subscription_id,
+    resource_group_name=resource_group,
+    workspace_name=workspace_name
 )
 
 # Unique endpoint name
