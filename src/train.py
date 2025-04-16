@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
 # Load dataset
-df = pd.read_csv("/data/raw/nlp_text_classification_dataset_2000.csv")
+df = pd.read_csv("data/processed/nlp_text_cleaned.csv")
 X = df["text"]
 y = df["label"]
 
