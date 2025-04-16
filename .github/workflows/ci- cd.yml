@@ -6,6 +6,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+    
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   build-train-eval-register:
