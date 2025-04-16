@@ -2,7 +2,7 @@ import os
 import mlflow
 from azure.identity import ClientSecretCredential
 from azure.ai.ml import MLClient
-from mlflow.azureml import register_model  # Azure MLflow plugin
+import register_model  # Azure MLflow plugin
 
 def register_model_pipeline():
     subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
