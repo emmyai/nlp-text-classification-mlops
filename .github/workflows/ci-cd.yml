@@ -64,7 +64,8 @@ jobs:
       run: python src/deploy_model.py
 
     - name: Upload model artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@10f09e3e3774c802d2c767a5b3a366e2e2b624c2
       with:
         name: model-artifacts
         path: models/
+    
