@@ -20,7 +20,7 @@ def register_model():
 
     # Generate safe unique model name
     timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
-    model_name = f"nlp-text-classification-model-{timestamp}"
+    model_name = f"nlp-text-model-{timestamp}"
 
     model = Model(
         path="models/sklearn_model",
