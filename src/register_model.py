@@ -1,32 +1,38 @@
-from azure.ai.ml import MLClient
-from azure.identity import ClientSecretCredential
-from azure.ai.ml.entities import Model
 import os
+import mlflow
+from azure.identity import DefaultAzureCredential
+from azure.ai.ml import MLClient
 
 def register_model():
-    # Use ClientSecretCredential for GitHub Actions authentication
-    credential = ClientSecretCredential(
-        tenant_id=os.getenv("AZURE_TENANT_ID"),
-        client_id=os.getenv("AZURE_CLIENT_ID"),
-        client_secret=os.getenv("AZURE_CLIENT_SECRET")
-    )
+    # Load Azure credentials from environment
+    subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
+    resource_group = os.environ["AZURE_RESOURCE_GROUP"]
+    workspace_name = os.environ["AZURE_WORKSPACE_NAME"]
 
-    ml_client = MLClient(
-        credential=credential,
-        subscription_id=os.getenv("AZURE_SUBSCRIPTION_ID"),
-        resource_group=os.getenv("AZURE_RESOURCE_GROUP"),
-        workspace_name=os.getenv("AZURE_WORKSPACE_NAME"),
-    )
+    # Use secure GitHub-injected Azure login
+    credential = DefaultAzureCredential()
 
-    model = Model(
-        path="models/model.joblib",
-        name="nlp-text-classification-model",
-        description="LogReg + TF-IDF NLP Classifier",
-        type="custom_model"
-    )
+    ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
+    tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
 
-    ml_client.models.create_or_update(model)
-    print("✅ Model registered in Azure ML.")
+    mlflow.set_tracking_uri(tracking_uri)
+    mlflow.set_experiment("NLP-Text-Classification")
+
+    client = mlflow.tracking.MlflowClient()
+    experiment = client.get_experiment_by_name("NLP-Text-Classification")
+
+    latest_run = client.search_runs(
+        experiment_ids=[experiment.experiment_id],
+        filter_string="attributes.status = 'FINISHED'",
+        order_by=["start_time DESC"],
+        max_results=1
+    )[0]
+
+    run_id = latest_run.info.run_id
+    model_uri = f"runs:/{run_id}/model"
+
+    registered_model = mlflow.register_model(model_uri=model_uri, name="nlp-text-classification-model")
+    print(f"✅ Model registered: {registered_model.name} (v{registered_model.version})")
 
 if __name__ == "__main__":
     register_model()
