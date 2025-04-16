@@ -1,16 +1,14 @@
 import os
 import mlflow
-from azure.identity import DefaultAzureCredential
+from azure.identity import AzureCliCredential
 from azure.ai.ml import MLClient
 
 def register_model():
-    # Load Azure credentials from environment
     subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
     resource_group = os.environ["AML_RESOURCE_GROUP"]
     workspace_name = os.environ["AML_WORKSPACE"]
 
-    # Use secure GitHub-injected Azure login
-    credential = DefaultAzureCredential()
+    credential = AzureCliCredential()
 
     ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
     tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
