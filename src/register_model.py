@@ -5,9 +5,9 @@ from azure.ai.ml import MLClient
 
 def register_model():
     # Load Azure credentials from environment
-    subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
-    resource_group = os.environ["AML_RESOURCE_GROUP"]
-    workspace_name = os.environ["AML_WORKSPACE"]
+    subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
+    resource_group = os.environ["AZURE_RESOURCE_GROUP"]
+    workspace_name = os.environ["AZURE_WORKSPACE_NAME"]
 
     # Use secure GitHub-injected Azure login
     credential = DefaultAzureCredential()
