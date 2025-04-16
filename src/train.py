@@ -1,37 +1,42 @@
-import os
 import pandas as pd
-import joblib
 import mlflow
 import mlflow.sklearn
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_extraction.text import TfidfVectorizer
+import joblib
+import os
 
-# Load dataset
-df = pd.read_csv("data/processed/nlp_text_cleaned.csv")
-X = df["text"]
-y = df["label"]
+mlflow.set_tracking_uri("file:./mlruns")
+mlflow.set_experiment("nlp-text-classification")
 
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+def train():
+    df = pd.read_csv("data/processed/nlp_text_cleaned.csv")
+    X = df["text"]
+    y = df["label"]
 
-# Define pipeline
-pipeline = Pipeline([
-    ('tfidf', TfidfVectorizer()),
-    ('clf', LogisticRegression(max_iter=1000))
-])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Create models directory if not exists
-os.makedirs("models", exist_ok=True)
+    pipeline = Pipeline([
+        ("tfidf", TfidfVectorizer()),
+        ("clf", LogisticRegression(max_iter=500))
+    ])
 
-# MLflow setup
-mlflow.set_tracking_uri("azureml://")
-mlflow.set_experiment("NLP-Text-Classification")
-with mlflow.start_run():
-    pipeline.fit(X_train, y_train)
-    mlflow.sklearn.log_model(pipeline, artifact_path="model")
-    joblib.dump(pipeline, "models/model.pkl")
-    joblib.dump(X_test, "models/X_test.pkl")
-    joblib.dump(y_test, "models/y_test.pkl")
-    print("Model trained, pickled, and logged to MLflow.")
+    with mlflow.start_run() as run:
+        pipeline.fit(X_train, y_train)
+
+        # Save model
+        joblib.dump(pipeline, "models/model.joblib")
+        mlflow.sklearn.log_model(pipeline, "model")
+        mlflow.log_param("model_type", "LogisticRegression")
+        mlflow.log_param("test_size", 0.2)
+
+        # Save test set for later evaluation
+        X_test.to_csv("data/processed/X_test.csv", index=False)
+        y_test.to_csv("data/processed/y_test.csv", index=False)
+
+        print(f"✅ Model trained and logged. Run ID: {run.info.run_id}")
+
+if __name__ == "__main__":
+    train()
