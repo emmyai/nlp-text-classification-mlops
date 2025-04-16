@@ -1,4 +1,4 @@
-name: NLP Text Classification CI/CD
+name: NLP Text Classification MLOps CI/CD
 
 on:
   push:
@@ -6,66 +6,41 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
-  train-and-register:
+  mlops-pipeline:
     runs-on: ubuntu-latest
 
     env:
       AML_SUBSCRIPTION_ID: ${{ secrets.AML_SUBSCRIPTION_ID }}
       AML_RESOURCE_GROUP: ${{ secrets.AML_RESOURCE_GROUP }}
       AML_WORKSPACE: ${{ secrets.AML_WORKSPACE }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install azure-ai-ml mlflow joblib scikit-learn pandas azure-identity jq
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r azureml-environment-setup/conda_dependencies.txt || true  # If you keep conda.yml there
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Run data validation
+        run: python src/data_validation.py
 
-    - name: Export Azure SP credentials as environment variables
-      run: |
-        echo "$AZURE_CREDENTIALS" > creds.json
-        echo "AZURE_CLIENT_ID=$(jq -r .clientId creds.json)" >> $GITHUB_ENV
-        echo "AZURE_TENANT_ID=$(jq -r .tenantId creds.json)" >> $GITHUB_ENV
-        echo "AZURE_CLIENT_SECRET=$(jq -r .clientSecret creds.json)" >> $GITHUB_ENV
+      - name: Preprocess data
+        run: python src/preprocessing.py
 
-    - name: Prepare folders and data
-      run: |
-        mkdir -p data/raw data/processed models
-        cp data/nlp_text_classification_dataset_2000.csv data/raw/ || true
+      - name: Train model and log to MLflow
+        run: python src/train.py
 
-    - name: Run Data Validation
-      run: python src/data_validation.py
+      - name: Evaluate model
+        run: python src/evaluate.py
 
-    - name: Run Preprocessing
-      run: python src/preprocessing.py
-
-    - name: Train Model and Log to Azure MLflow
-      run: python src/train.py
-
-    - name: Evaluate Model and Log Metrics
-      run: python src/evaluate.py
-
-    - name: Register Model to Azure ML
-      run: python src/register_model.py
-
-    # Optional: Deploy model if desired
-    # - name: Deploy Model
-    #   run: python src/deploy_model.py
+      - name: Register model to Azure ML
+        run: python src/register_model.py
