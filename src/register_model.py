@@ -19,13 +19,14 @@ def register_model():
 
     # Register model directly from local path
     model = Model(
-    path="models/sklearn_model",  # ✅ Pass directory, not .pkl file directly
-    name="nlp-text-classification-model",
-    description="TF-IDF + Logistic Regression model for text classification",
+    path="models/sklearn_model",
+    name="nlp-text-classification-model-v2",  # new name to avoid corrupted metadata
+    description="Logistic Regression text classification model",
     type="custom_model"
-    )
+)
 
     registered_model = ml_client.models.create_or_update(model)
+
     print(f"✅ Model registered in Azure ML: {registered_model.name} (v{registered_model.version})")
 
 if __name__ == "__main__":
