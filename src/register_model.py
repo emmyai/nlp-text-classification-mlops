@@ -1,8 +1,8 @@
-
 import os
 from azure.identity import ClientSecretCredential
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Model
+from datetime import datetime
 
 def register_model():
     subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
@@ -15,19 +15,22 @@ def register_model():
         client_secret=os.environ["AZURE_CLIENT_SECRET"]
     )
 
+
     ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
 
-    # Register model directly from local path
+    # Generate safe unique model name
+    timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    model_name = f"nlp-text-classification-model-{timestamp}"
+
     model = Model(
-    path="models/sklearn_model",
-    name="nlp-text-classification-model-v2",  # new name to avoid corrupted metadata
-    description="Logistic Regression text classification model",
-    type="custom_model"
-)
+        path="models/sklearn_model",
+        name=model_name,
+        description="Logistic Regression text classifier",
+        type="custom_model"
+    )
 
     registered_model = ml_client.models.create_or_update(model)
-
-    print(f"✅ Model registered in Azure ML: {registered_model.name} (v{registered_model.version})")
+    print(f"✅ Model registered: {registered_model.name}, version: {registered_model.version}")
 
 if __name__ == "__main__":
     register_model()
