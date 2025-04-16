@@ -21,8 +21,8 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
         return X.apply(self.clean_text)
 
 if __name__ == "__main__":
-    df = pd.read_csv("../data/raw/nlp_text_classification_dataset_2000.csv")
+    df = pd.read_csv("data/raw/nlp_text_classification_dataset_2000.csv")
     processor = TextPreprocessor()
     df["text"] = processor.transform(df["text"])
-    df.to_csv("..data/processed/nlp_text_cleaned.csv", index=False)
+    df.to_csv("data/processed/nlp_text_cleaned.csv", index=False)
     print("Text preprocessing complete and saved to 'nlp_text_cleaned.csv'")
