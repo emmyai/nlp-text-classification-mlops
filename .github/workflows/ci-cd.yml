@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-      AZURE_WORKSPACE_NAME: ${{ secrets.AZURE_WORKSPACE_NAME }}
+      AML_SUBSCRIPTION_ID: ${{ secrets.AML_SUBSCRIPTION_ID }}
+      AML_RESOURCE_GROUP: ${{ secrets.AML_RESOURCE_GROUP }}
+      AML_WORKSPACE: ${{ secrets.AML_WORKSPACE }}
 
     steps:
       - name: Checkout repo
