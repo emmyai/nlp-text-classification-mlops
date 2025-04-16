@@ -4,3 +4,4 @@ scikit-learn
 joblib
 azure-identity
 azure-ai-ml
+azureml-mlflow
