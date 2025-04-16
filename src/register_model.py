@@ -1,6 +1,6 @@
 import os
 import mlflow
-from azure.identity import AzureCliCredential
+from azure.identity import ClientSecretCredential
 from azure.ai.ml import MLClient
 
 def register_model():
@@ -8,7 +8,11 @@ def register_model():
     resource_group = os.environ["AML_RESOURCE_GROUP"]
     workspace_name = os.environ["AML_WORKSPACE"]
 
-    credential = AzureCliCredential()
+    credential = ClientSecretCredential(
+        tenant_id=os.environ["AZURE_TENANT_ID"],
+        client_id=os.environ["AZURE_CLIENT_ID"],
+        client_secret=os.environ["AZURE_CLIENT_SECRET"]
+    )
 
     ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
     tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
