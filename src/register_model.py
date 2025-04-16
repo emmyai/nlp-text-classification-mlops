@@ -19,10 +19,10 @@ def register_model():
 
     # Register model directly from local path
     model = Model(
-        path="models/model.pkl",
-        name="nlp-text-classification-model",
-        description="TF-IDF + Logistic Regression model for text classification",
-        type="custom_model"
+    path="models/sklearn_model",  # ✅ Pass directory, not .pkl file directly
+    name="nlp-text-classification-model",
+    description="TF-IDF + Logistic Regression model for text classification",
+    type="custom_model"
     )
 
     registered_model = ml_client.models.create_or_update(model)

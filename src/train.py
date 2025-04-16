@@ -27,8 +27,9 @@ def train():
         pipeline.fit(X_train, y_train)
 
         # ✅ Ensure 'models/' folder exists
-        os.makedirs("models", exist_ok=True)
-
+        # ✅ After (save in a directory):
+        os.makedirs("models/sklearn_model", exist_ok=True)
+        joblib.dump(pipeline, "models/sklearn_model/model.pkl")
         # Save model
         joblib.dump(pipeline, "models/model.joblib")
         mlflow.sklearn.log_model(pipeline, "model")
