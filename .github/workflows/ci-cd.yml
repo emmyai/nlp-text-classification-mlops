@@ -1,4 +1,4 @@
-name: NLP-Text-Classification-Pipeline
+name: NLP Text Classification CI/CD
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   actions: read
 
 jobs:
-  build-train-eval-register:
+  train-and-deploy:
     runs-on: ubuntu-latest
 
     env:
@@ -32,40 +32,34 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -r requirements.txt
-        pip install azure-ai-ml mlflow joblib
+        pip install azure-ai-ml mlflow joblib scikit-learn pandas
 
     - name: Azure Login
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Create necessary folders
+    - name: Create required folders
       run: |
         mkdir -p data/raw
         mkdir -p data/processed
-        cp data/nlp_text_classification_dataset_2000.csv data/raw/
+        mkdir -p models
+        cp data/nlp_text_classification_dataset_2000.csv data/raw/ || true
 
-    - name: Run data validation
+    - name: Run Data Validation
       run: python src/data_validation.py
 
-    - name: Run preprocessing
+    - name: Run Preprocessing
       run: python src/preprocessing.py
 
-    - name: Train model (with Azure MLflow tracking)
+    - name: Train Model and Log to Azure MLflow
       run: python src/train.py
 
-    - name: Evaluate model
+    - name: Evaluate Model and Log Metrics to Azure MLflow
       run: python src/evaluate.py
 
-    - name: Register model
-      run: python src/register_model.py
-
-    - name: Deploy model
-      run: python src/deploy_model.py
-
-    - name: Upload model artifacts
-      uses: actions/upload-artifact@10f09e3e3774c802d2c767a5b3a366e2e2b624c2
+    - name: Upload Model Artifacts
+      uses: actions/upload-artifact@v3
       with:
         name: model-artifacts
         path: models/
-    
