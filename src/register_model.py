@@ -8,6 +8,11 @@ def register_model():
     resource_group = os.environ["AML_RESOURCE_GROUP"]
     workspace_name = os.environ["AML_WORKSPACE"]
 
+    # Print for sanity check
+    print("subscription_id:", subscription_id)
+    print("resource_group:", resource_group)
+    print("workspace_name:", workspace_name)
+
     credential = ClientSecretCredential(
         tenant_id=os.environ["AZURE_TENANT_ID"],
         client_id=os.environ["AZURE_CLIENT_ID"],
@@ -15,8 +20,9 @@ def register_model():
     )
 
     ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
-    tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
 
+    # Manually format the MLflow tracking URI (avoids .get() errors)
+    tracking_uri = f"azureml://subscriptions/{subscription_id}/resourceGroups/{resource_group}/workspaces/{workspace_name}"
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("NLP-Text-Classification")
 
