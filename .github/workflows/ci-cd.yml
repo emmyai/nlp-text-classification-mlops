@@ -31,9 +31,9 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        
         pip install -r requirements.txt
-        pip install azure-ai-ml mlflow joblib scikit-learn pandas azure-identity jq
+        pip install azure-ai-ml azureml-mlflow joblib scikit-learn pandas azure-identity jq
+
 
     - name: Azure Login
       uses: azure/login@v1
