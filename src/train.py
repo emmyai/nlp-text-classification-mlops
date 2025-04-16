@@ -8,18 +8,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
-# Define paths
-DATA_PATH = "data/processed/nlp_text_cleaned.csv"
-MODEL_DIR = "models"
-X_TEST_PATH = os.path.join(MODEL_DIR, "X_test.pkl")
-Y_TEST_PATH = os.path.join(MODEL_DIR, "y_test.pkl")
-MODEL_PATH = os.path.join(MODEL_DIR, "text_classification_model.pkl")
-
-# Create model directory if not exists
-os.makedirs(MODEL_DIR, exist_ok=True)
-
 # Load dataset
-df = pd.read_csv(DATA_PATH)
+df = pd.read_csv("data/processed/nlp_text_cleaned.csv")
 X = df["text"]
 y = df["label"]
 
@@ -32,17 +22,16 @@ pipeline = Pipeline([
     ('clf', LogisticRegression(max_iter=1000))
 ])
 
+# Create models directory if not exists
+os.makedirs("models", exist_ok=True)
+
 # MLflow setup
+mlflow.set_tracking_uri("azureml://")
 mlflow.set_experiment("NLP-Text-Classification")
 with mlflow.start_run():
     pipeline.fit(X_train, y_train)
-
-    # Log model with MLflow
-    mlflow.sklearn.log_model(pipeline, "model")
-
-    # Dump model and test data to disk
-    joblib.dump(pipeline, MODEL_PATH)
-    joblib.dump(X_test, X_TEST_PATH)
-    joblib.dump(y_test, Y_TEST_PATH)
-
-    print(f"Model and test sets saved to '{MODEL_DIR}' and logged to MLflow.")
+    mlflow.sklearn.log_model(pipeline, artifact_path="model")
+    joblib.dump(pipeline, "models/model.pkl")
+    joblib.dump(X_test, "models/X_test.pkl")
+    joblib.dump(y_test, "models/y_test.pkl")
+    print("Model trained, pickled, and logged to MLflow.")

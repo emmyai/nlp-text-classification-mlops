@@ -28,6 +28,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install azureml-core azureml-mlflow joblib
+
+    - name: Upload Azure ML config
+      run: |
+        echo '${{ secrets.AZURE_CREDENTIALS }}' > config.json
 
     - name: Run data validation
       run: python src/data_validation.py
@@ -48,3 +53,9 @@ jobs:
 
     - name: Deploy model
       run: python src/deploy_model.py
+
+    - name: Upload model artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: model-objects
+        path: models/
