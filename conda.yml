@@ -1,0 +1,14 @@
+name: nlp-text-classification
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - mlflow
+      - pandas
+      - scikit-learn
+      - joblib
+      - azure-identity
+      - azure-ai-ml

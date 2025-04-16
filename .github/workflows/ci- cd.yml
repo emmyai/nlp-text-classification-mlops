@@ -1,0 +1,50 @@
+# GitHub Actions CI/CD Workflow
+name: NLP-Text-Classification-Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-train-eval-register:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      AZURE_WORKSPACE_NAME: ${{ secrets.AZURE_WORKSPACE_NAME }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run data validation
+      run: python src/data_validation.py
+
+    - name: Run preprocessing
+      run: python src/preprocessing.py
+
+    - name: Train model
+      run: python src/train.py
+
+    - name: Evaluate model
+      run: python src/evaluate.py
+
+    - name: Register model
+      run: |
+        echo "Ensure correct run_id is passed in register_model.py"
+        python src/register_model.py
+
+    - name: Deploy model
+      run: python src/deploy_model.py
