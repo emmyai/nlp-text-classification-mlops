@@ -1,26 +1,36 @@
+import pandas as pd
 import joblib
 import mlflow
 from sklearn.metrics import accuracy_score, classification_report
 import os
 
-# Load model and data
-model = joblib.load("models/model.pkl")
-X_test = joblib.load("models/X_test.pkl")
-y_test = joblib.load("models/y_test.pkl")
+# Set MLflow experiment and tracking URI
+mlflow.set_tracking_uri("file:./mlruns")
+mlflow.set_experiment("nlp-text-classification")
 
-# Predict and evaluate
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-report = classification_report(y_test, y_pred, output_dict=True)
+def evaluate():
+    # Ensure files exist
+    if not os.path.exists("models/model.joblib"):
+        raise FileNotFoundError("Trained model not found. Run train.py first.")
+    if not os.path.exists("data/processed/X_test.csv") or not os.path.exists("data/processed/y_test.csv"):
+        raise FileNotFoundError("Test data not found. Ensure train.py has run successfully.")
 
-# Log metrics
-mlflow.set_tracking_uri("azureml://")
-mlflow.set_experiment("NLP-Text-Classification")
-with mlflow.start_run():
-    mlflow.log_metric("accuracy", accuracy)
-    for label, metrics in report.items():
-        if isinstance(metrics, dict):
-            for metric_name, value in metrics.items():
-                mlflow.log_metric(f"{label}_{metric_name}", value)
+    # Load model and test data
+    model = joblib.load("models/model.joblib")
+    X_test = pd.read_csv("data/processed/X_test.csv")
+    y_test = pd.read_csv("data/processed/y_test.csv")
 
-print(f"Evaluation complete. Accuracy: {accuracy:.4f}")
+    with mlflow.start_run(nested=True):
+        preds = model.predict(X_test["text"])
+        acc = accuracy_score(y_test, preds)
+
+        # Log metrics
+        mlflow.log_metric("accuracy", acc)
+        report = classification_report(y_test, preds)
+        mlflow.log_text(report, "classification_report.txt")
+
+        print(f"✅ Evaluation complete. Accuracy: {acc:.4f}")
+        print("📋 Classification report logged to MLflow.")
+
+if __name__ == "__main__":
+    evaluate()
