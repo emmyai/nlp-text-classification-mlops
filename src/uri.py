@@ -2,11 +2,12 @@ from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
 import os
 
-subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
-resource_group = os.environ["AML_RESOURCE_GROUP"]
-workspace_name = os.environ["AML_WORKSPACE"]
-credential = DefaultAzureCredential()
 
-ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
+AML_SUBSCRIPTION_ID = os.environ["AML_SUBSCRIPTION_ID"]
+AML_RESOURCE_GROUP = os.environ["AML_RESOURCE_GROUP"]
+AML_WORKSPACE = os.environ["AML_WORKSPACE"]
+AZURE_CREDENTIALS = os.environ["AZURE_CREDENTIALS"]
 
-print("✅ MLflow Tracking URI:", ml_client.workspaces.get(workspace_name).mlflow_tracking_uri)
+ml_client = MLClient(AZURE_CREDENTIALS, AML_SUBSCRIPTION_ID, AML_RESOURCE_GROUP, AML_WORKSPACE)
+
+print("✅ MLflow Tracking URI:", ml_client.workspaces.get(AML_WORKSPACE).mlflow_tracking_uri)
