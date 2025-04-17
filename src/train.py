@@ -38,11 +38,12 @@ def train():
     X = df["text"]
     y = df["label"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
 
     pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer()),
-        ("clf", DecisionTreeClassifier())
+        ("tfidf", TfidfVectorizer(max_features=10000, ngram_range=(1,2))),
+        ("clf", DecisionTreeClassifier(max_depth=10, min_samples_leaf=5))
+
     ])
 
     with mlflow.start_run() as run:
