@@ -5,10 +5,31 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
+import joblib
 import os
+import json
+from azure.identity import ClientSecretCredential
+from azure.ai.ml import MLClient
 
-# Set the MLflow tracking URI to Azure Machine Learning
-mlflow.set_tracking_uri("azureml://eastus2.api.azureml.ms/mlflow/v2.0/subscriptions/***/resourceGroups/***/providers/Microsoft.MachineLearningServices/workspaces/***")
+# Load credentials from the AZURE_CREDENTIALS secret
+azure_credentials = json.loads(os.environ["AZURE_CREDENTIALS"])
+
+subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
+resource_group = os.environ["AML_RESOURCE_GROUP"]
+workspace_name = os.environ["AML_WORKSPACE"]
+tenant_id=os.environ["AZURE_TENANT_ID"]
+client_id=os.environ["AZURE_CLIENT_ID"]
+client_secret=os.environ["AZURE_CLIENT_SECRET"]
+
+# Authenticate using ClientSecretCredential
+credential = ClientSecretCredential(tenant_id, client_id, client_secret)
+
+# Initialize MLClient
+ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
+
+# Print MLflow tracking URI
+tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
+mlflow.set_tracking_uri(tracking_uri)
 mlflow.set_experiment("nlp-text-classification")
 
 def train():
@@ -26,8 +47,15 @@ def train():
     with mlflow.start_run() as run:
         pipeline.fit(X_train, y_train)
 
-        # Log the model with MLflow
-        mlflow.sklearn.log_model(pipeline, artifact_path="model", registered_model_name="nlp-text-classification-model")
+        # Ensure model directory exists
+        os.makedirs("models/sklearn_model", exist_ok=True)
+
+        # Save the model artifact locally
+        joblib.dump(pipeline, "models/sklearn_model/model.pkl")
+
+        # Log model to Azure ML via MLflow
+        mlflow.sklearn.log_model(pipeline, artifact_path="model")
+
         mlflow.log_param("model_type", "LogisticRegression")
         mlflow.log_param("test_size", 0.2)
 
