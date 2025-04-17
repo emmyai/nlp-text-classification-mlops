@@ -4,6 +4,7 @@ import mlflow.sklearn
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier 
 from sklearn.feature_extraction.text import TfidfVectorizer
 import joblib
 import os
@@ -56,7 +57,7 @@ def train():
         # Log model to Azure ML via MLflow
         mlflow.sklearn.log_model(pipeline, artifact_path="model")
 
-        mlflow.log_param("model_type", "LogisticRegression")
+        mlflow.log_param("model_type", "DecisionTreeClassifier")
         mlflow.log_param("test_size", 0.2)
 
         # Save test set for evaluation
