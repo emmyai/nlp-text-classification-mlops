@@ -8,7 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import os
 
 # Set the MLflow tracking URI to Azure Machine Learning
-mlflow.set_tracking_uri("azureml://<your-azureml-tracking-uri>")
+mlflow.set_tracking_uri("azureml://eastus2.api.azureml.ms/mlflow/v2.0/subscriptions/***/resourceGroups/***/providers/Microsoft.MachineLearningServices/workspaces/***")
 mlflow.set_experiment("nlp-text-classification")
 
 def train():

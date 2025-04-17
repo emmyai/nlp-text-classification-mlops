@@ -65,15 +65,15 @@ jobs:
     - name: tracking uri
       run: python src/uri.py
 
-    # - name: Train Model and Log to Azure MLflow
-    #   run: python src/train.py
+    - name: Train Model and Log to Azure MLflow
+      run: python src/train.py
 
-    # - name: Evaluate Model and Log Metrics
-    #   run: python src/evaluate.py
+    - name: Evaluate Model and Log Metrics
+      run: python src/evaluate.py
 
     # - name: Register Model to Azure ML
     #   run: python src/register_model.py
 
     # Optional: Deploy model if desired
-    - name: Deploy Model
-      run: python src/deploy_model.py
+    # - name: Deploy Model
+    #   run: python src/deploy_model.py
