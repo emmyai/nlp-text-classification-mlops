@@ -9,8 +9,8 @@ def register_model():
     subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
     resource_group = os.environ["AML_RESOURCE_GROUP"]
     workspace_name = os.environ["AML_WORKSPACE"]
-    tenant_id=os.environ["AZURE_TENANT_ID"],
-    client_id=os.environ["AZURE_CLIENT_ID"],
+    tenant_id=os.environ["AZURE_TENANT_ID"]
+    client_id=os.environ["AZURE_CLIENT_ID"]
     client_secret=os.environ["AZURE_CLIENT_SECRET"]
 
     # Authenticate securely with Azure
