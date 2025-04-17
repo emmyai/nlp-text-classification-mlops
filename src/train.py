@@ -31,7 +31,7 @@ ml_client = MLClient(credential, subscription_id, resource_group, workspace_name
 # Print MLflow tracking URI
 tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
 mlflow.set_tracking_uri(tracking_uri)
-mlflow.set_experiment("nlp-text-classification")
+mlflow.set_experiment("nlp-text-classification_01")
 
 def train():
     df = pd.read_csv("data/processed/nlp_text_cleaned.csv")
@@ -42,7 +42,7 @@ def train():
 
     pipeline = Pipeline([
         ("tfidf", TfidfVectorizer()),
-        ("clf", LogisticRegression(max_iter=500))
+        ("clf", DecisionTreeClassifier())
     ])
 
     with mlflow.start_run() as run:
@@ -58,7 +58,7 @@ def train():
         mlflow.sklearn.log_model(pipeline, artifact_path="model")
 
         mlflow.log_param("model_type", "DecisionTreeClassifier")
-        mlflow.log_param("test_size", 0.2)
+        mlflow.log_param("test_size", 0.25)
 
         # Save test set for evaluation
         os.makedirs("data/processed", exist_ok=True)

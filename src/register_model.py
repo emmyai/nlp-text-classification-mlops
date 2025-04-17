@@ -27,7 +27,7 @@ def register_model():
     tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
     mlflow.set_tracking_uri(tracking_uri)
 
-    experiment_name = "nlp-text-classification"
+    experiment_name = "nlp-text-classification_01"
 
     # Get the latest run from MLflow experiment
     experiment = mlflow.get_experiment_by_name(experiment_name)
@@ -44,7 +44,7 @@ def register_model():
     print(f"✅ Registering model from MLflow run ID: {latest_run_id}")
 
     # Register MLflow model to Azure ML directly
-    model_name = "decision-tree-model"
+    model_name = "decision-tree-model_01"
     registered_model = mlflow.register_model(
         model_uri=model_uri,
         name=model_name
