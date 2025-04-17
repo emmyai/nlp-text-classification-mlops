@@ -32,7 +32,9 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -r requirements.txt
-        pip install azure-ai-ml azureml-mlflow joblib scikit-learn pandas azure-identity jq
+        pip install --upgrade azure-ai-ml
+        pip install --upgrade azureml-mlflow
+        pip install azure-ai-ml joblib scikit-learn pandas azure-identity jq
         pip install marshmallow==3.20.1
 
 
@@ -60,14 +62,17 @@ jobs:
     - name: Run Preprocessing
       run: python src/preprocessing.py
 
-    - name: Train Model and Log to Azure MLflow
-      run: python src/train.py
+    - name: tracking uri
+      run: python src/uri.py
 
-    - name: Evaluate Model and Log Metrics
-      run: python src/evaluate.py
+    # - name: Train Model and Log to Azure MLflow
+    #   run: python src/train.py
 
-    - name: Register Model to Azure ML
-      run: python src/register_model.py
+    # - name: Evaluate Model and Log Metrics
+    #   run: python src/evaluate.py
+
+    # - name: Register Model to Azure ML
+    #   run: python src/register_model.py
 
     # Optional: Deploy model if desired
     - name: Deploy Model

@@ -5,10 +5,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
-import joblib
 import os
 
-mlflow.set_tracking_uri("file:./mlruns")
+# Set the MLflow tracking URI to Azure Machine Learning
+mlflow.set_tracking_uri("azureml://<your-azureml-tracking-uri>")
 mlflow.set_experiment("nlp-text-classification")
 
 def train():
@@ -26,13 +26,8 @@ def train():
     with mlflow.start_run() as run:
         pipeline.fit(X_train, y_train)
 
-        # ✅ Ensure 'models/' folder exists
-        # ✅ After (save in a directory):
-        os.makedirs("models/sklearn_model", exist_ok=True)
-        joblib.dump(pipeline, "models/sklearn_model/model.pkl")
-        # Save model
-        joblib.dump(pipeline, "models/model.joblib")
-        mlflow.sklearn.log_model(pipeline, "model")
+        # Log the model with MLflow
+        mlflow.sklearn.log_model(pipeline, artifact_path="model", registered_model_name="nlp-text-classification-model")
         mlflow.log_param("model_type", "LogisticRegression")
         mlflow.log_param("test_size", 0.2)
 
