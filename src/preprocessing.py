@@ -22,7 +22,7 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
         return X.apply(self.clean_text)
 
 if __name__ == "__main__":
-    df = pd.read_csv("data/raw/nlp_text_classification_dataset_2000.csv")
+    df = pd.read_csv("data/raw/nlp_text_classification_dataset_10000.csv")
     processor = TextPreprocessor()
     df["text"] = processor.transform(df["text"])
 
