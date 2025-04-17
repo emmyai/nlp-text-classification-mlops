@@ -1,8 +1,10 @@
+# deploy_model.py
 import os
 import uuid
 from azure.identity import ClientSecretCredential
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import ManagedOnlineEndpoint, ManagedOnlineDeployment
+from azure.core.exceptions import ResourceNotFoundError
 
 def deploy_model():
     subscription_id = os.environ["AML_SUBSCRIPTION_ID"]
@@ -20,29 +22,34 @@ def deploy_model():
 
     ml_client = MLClient(credential, subscription_id, resource_group, workspace_name)
 
-    # Fetch latest model version dynamically
     model_name = "nlp-text-classification-model"
     registered_models = ml_client.models.list(name=model_name)
     latest_model = max(registered_models, key=lambda x: int(x.version))
     latest_model_version = latest_model.version
     print(f"✅ Latest model version: {latest_model_version}")
 
-    endpoint_name = f"nlp-endpoint-{uuid.uuid4().hex[:6]}"
+    endpoint_name = "nlp-text-endpoint"
 
-    endpoint = ManagedOnlineEndpoint(
-        name=endpoint_name,
-        auth_mode="key"
-    )
-    print(f"🚀 Creating endpoint: {endpoint_name}")
-    ml_client.begin_create_or_update(endpoint).result()
+    # Create endpoint if it doesn't exist
+    try:
+        ml_client.online_endpoints.get(endpoint_name)
+        print(f"✅ Endpoint '{endpoint_name}' already exists.")
+    except ResourceNotFoundError:
+        print(f"🚀 Creating endpoint: {endpoint_name}")
+        endpoint = ManagedOnlineEndpoint(
+            name=endpoint_name,
+            auth_mode="key"
+        )
+        ml_client.begin_create_or_update(endpoint).result()
 
     deployment = ManagedOnlineDeployment(
-        name="default",
+        name="endpoint-compute",
         endpoint_name=endpoint_name,
         model=f"{model_name}:{latest_model_version}",
-        instance_type="Standard_DS3_v2",  # Updated SKU
+        instance_type="Standard_F2s_v2",
         instance_count=1
     )
+
     print(f"🚀 Deploying model version {latest_model_version} to endpoint: {endpoint_name}")
     ml_client.begin_create_or_update(deployment).result()
 
@@ -51,7 +58,13 @@ def deploy_model():
         default_deployment_name="default"
     ).result()
 
-    print(f"✅ Deployment successful at endpoint: {endpoint_name}")
+    # Get endpoint scoring URL and key
+    endpoint = ml_client.online_endpoints.get(endpoint_name)
+    keys = ml_client.online_endpoints.list_keys(endpoint_name)
+
+    print(f"\n✅ Deployment successful!")
+    print(f"🔗 Scoring URI: {endpoint.scoring_uri}")
+    print(f"🔑 Primary Key: {keys.primary_key}")
 
 if __name__ == "__main__":
     deploy_model()
