@@ -31,7 +31,7 @@ ml_client = MLClient(credential, subscription_id, resource_group, workspace_name
 # Print MLflow tracking URI
 tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
 mlflow.set_tracking_uri(tracking_uri)
-mlflow.set_experiment("nlp-text-classification_01")
+mlflow.set_experiment("nlp-text-classification")
 
 def train():
     df = pd.read_csv("data/processed/nlp_text_cleaned.csv")

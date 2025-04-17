@@ -27,7 +27,7 @@ def register_model():
     tracking_uri = ml_client.workspaces.get(workspace_name).mlflow_tracking_uri
     mlflow.set_tracking_uri(tracking_uri)
 
-    experiment_name = "nlp-text-classification_01"
+    experiment_name = "nlp-text-classification"
 
     # Get the latest run from MLflow experiment
     experiment = mlflow.get_experiment_by_name(experiment_name)
