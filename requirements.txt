@@ -5,3 +5,4 @@ joblib
 azure-identity
 azure-ai-ml
 azureml-mlflow
+marshmallow==3.20.1
