@@ -42,7 +42,7 @@ def evaluate():
     y_test = pd.read_csv(y_test_path)
 
     with mlflow.start_run(nested=True):
-        preds = model.predict(X_test["text"])
+        preds = model.predict(X_test)
         acc = accuracy_score(y_test, preds)
 
         # Log metrics
