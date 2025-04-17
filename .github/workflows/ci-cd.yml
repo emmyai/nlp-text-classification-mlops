@@ -74,6 +74,6 @@ jobs:
     - name: Register Model to Azure ML
       run: python src/register_model.py
 
-    # Optional: Deploy model if desired
-    # - name: Deploy Model
-    #   run: python src/deploy_model.py
+    #Optional: Deploy model if desired
+    - name: Deploy Model
+      run: python src/deploy_model.py
