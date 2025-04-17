@@ -5,6 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier 
+from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfVectorizer
 import joblib
 import os
@@ -42,7 +43,7 @@ def train():
 
     pipeline = Pipeline([
         ("tfidf", TfidfVectorizer(max_features=10000, ngram_range=(1,2))),
-        ("clf", DecisionTreeClassifier(max_depth=10, min_samples_leaf=5))
+        ("clf", SVC(kernel='rbf'))
 
     ])
 
