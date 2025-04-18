@@ -172,7 +172,7 @@ def train():
 
         os.makedirs("models/sklearn_model", exist_ok=True)
 
-        joblib.dump(best_model, "models/sklearn_model/best_model.pkl")
+        joblib.dump(best_model, "models/sklearn_model/model_1.pkl")
 
         # Save test data
 
