@@ -9,6 +9,8 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
         self.pattern = re.compile(r"[^a-zA-Z\s]")
 
     def clean_text(self, text):
+        if pd.isnull(text):
+            return ""
         text = text.lower()
         text = self.pattern.sub("", text)
         text = text.translate(str.maketrans("", "", string.punctuation))
@@ -23,25 +25,27 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
 
 if __name__ == "__main__":
     raw_path = "data/raw/Sentiment_Classification_Dataset.csv"
-    output_path = "data/processed/nlp_text_cleaned.csv"
-    df = pd.read_csv("data/raw/Sentiment_Classification_Dataset.csv", encoding="ISO-8859-1", errors="replace")
+    
+    # ✅ Read with encoding fix
+    try:
+        df = pd.read_csv(raw_path, encoding="ISO-8859-1")
+    except Exception as e:
+        print(f"❌ Failed to read file: {e}")
+        exit(1)
 
-    print(f"📄 Initial dataset shape: {df.shape}")
-
-    # Drop rows with missing text or label
+    # ✅ Drop missing values
     df.dropna(subset=["text", "label"], inplace=True)
-    print(f"🧹 After dropping missing values: {df.shape}")
 
-    # Remove duplicate rows
-    df.drop_duplicates(subset=["text", "label"], inplace=True)
-    print(f"📌 After removing duplicates: {df.shape}")
+    # ✅ Drop duplicates
+    df.drop_duplicates(inplace=True)
 
-    # Apply text cleaning
+    # ✅ Clean text
     processor = TextPreprocessor()
     df["text"] = processor.transform(df["text"])
 
-    # Ensure output directory exists
+    # ✅ Ensure output directory exists
     os.makedirs("data/processed", exist_ok=True)
-    df.to_csv(output_path, index=False)
 
-    print(f"✅ Preprocessing complete. Cleaned data saved to '{output_path}'")
+    # ✅ Save cleaned dataset
+    df.to_csv("data/processed/nlp_text_cleaned.csv", index=False, encoding="utf-8")
+    print("✅ Text preprocessing complete and saved to 'nlp_text_cleaned.csv'")

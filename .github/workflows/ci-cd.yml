@@ -56,11 +56,11 @@ jobs:
         mkdir -p data/raw data/processed models
         cp data/nlp_text_classification_dataset_2000.csv data/raw/ || true
 
-    - name: Run Data Validation
-      run: python src/data_validation.py
-
     - name: Run Preprocessing
       run: python src/preprocessing.py
+
+    - name: Run Data Validation
+      run: python src/data_validation.py
 
     - name: tracking uri
       run: python src/uri.py
