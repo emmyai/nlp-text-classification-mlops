@@ -24,8 +24,7 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
 if __name__ == "__main__":
     raw_path = "data/raw/Sentiment_Classification_Dataset.csv"
     output_path = "data/processed/nlp_text_cleaned.csv"
-
-    df = pd.read_csv(raw_path)
+    df = pd.read_csv("data/raw/Sentiment_Classification_Dataset.csv", encoding="utf-8", errors="replace")
 
     print(f"📄 Initial dataset shape: {df.shape}")
 
