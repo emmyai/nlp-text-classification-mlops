@@ -4,7 +4,9 @@
       "random_state": 0,
       "max_features": 3000,
       "ngram_range": [1, 2],
-      "model_type": "LogisticRegression"
+      "model_type": "LogisticRegression",
+      "penalty": "l2",
+      "C": 0.7
     },
     "evaluate": {
       "model_path": "models/sklearn_model/model_1.pkl",
