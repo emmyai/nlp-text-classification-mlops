@@ -12,6 +12,8 @@ import os
 import json
 from azure.identity import ClientSecretCredential
 from azure.ai.ml import MLClient
+from load_config import load_parameters
+
 
 # Load credentials from the AZURE_CREDENTIALS secret
 azure_credentials = json.loads(os.environ["AZURE_CREDENTIALS"])
@@ -22,6 +24,18 @@ workspace_name = os.environ["AML_WORKSPACE"]
 tenant_id=os.environ["AZURE_TENANT_ID"]
 client_id=os.environ["AZURE_CLIENT_ID"]
 client_secret=os.environ["AZURE_CLIENT_SECRET"]
+
+from load_config import load_parameters
+
+config = load_parameters()
+train_config = config["train"]
+
+test_size = train_config["test_size"]
+random_state = train_config["random_state"]
+max_features = train_config["max_features"]
+ngram_range = tuple(train_config["ngram_range"])
+model_type = train_config["model_type"]
+
 
 # Authenticate using ClientSecretCredential
 credential = ClientSecretCredential(tenant_id, client_id, client_secret)
@@ -39,13 +53,11 @@ def train():
     X = df["text"]
     y = df["label"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0, stratify=y)
-
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
 
     pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=3000, ngram_range=(1, 2), stop_words='english')),
-        ("clf", LogisticRegression())
-
+    ("tfidf", TfidfVectorizer(max_features=max_features, ngram_range=ngram_range, stop_words='english')),
+    ("clf", LogisticRegression())  # adjust based on model_type if needed
     ])
 
     with mlflow.start_run() as run:
