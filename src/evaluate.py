@@ -74,20 +74,24 @@ def evaluate():
         report = classification_report(y_test, preds)
         mlflow.log_text(report, "classification_report.txt")
 
-        print(f"\u2705 Test set accuracy: {acc:.4f}")   
-        print("\ud83d\udccb Test classification report logged.")
+        print("✅ Test set accuracy: {:.4f}".format(acc))
+  
+        print("📋 Test classification report logged.")
 
         # Cross-validation score with fresh pipeline to avoid leakage
-        print("\ud83d\udd01 Running cross-validation (cv=5)...")
+        print("🔁 Running cross-validation (cv=5)...")
+
         pipeline = Pipeline([
         ("tfidf", TfidfVectorizer(max_features=max_features, ngram_range=ngram_range, stop_words='english')),
         ("clf", LogisticRegression())  # adjust based on model_type if needed
         ])
         cv_scores = cross_val_score(pipeline, X_full, y_full, cv=5, scoring="accuracy")
         mlflow.log_metric("cv_mean_accuracy", cv_scores.mean())
-        print("\u2705 Cross-validation complete.")
+        print("✅ Cross-validation complete.")
         print("CV Scores:", cv_scores)
         print("Mean CV Accuracy:", cv_scores.mean())
 
 if __name__ == "__main__":
     evaluate()
+
+
