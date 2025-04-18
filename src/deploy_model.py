@@ -34,7 +34,7 @@ def deploy_model():
         ml_client.begin_create_or_update(endpoint).result()
 
     # Get the latest version of the model
-    model_name = "decision-tree-model_01"
+    model_name = "Logistic_Regression_model"
     registered_models = ml_client.models.list(name=model_name)
     latest_model = max(registered_models, key=lambda m: int(m.version))
     latest_version = latest_model.version
