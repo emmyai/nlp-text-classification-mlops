@@ -22,12 +22,27 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
         return X.apply(self.clean_text)
 
 if __name__ == "__main__":
-    df = pd.read_csv("data/raw/Sentiment_Classification_Dataset.csv")
+    raw_path = "data/raw/Sentiment_Classification_Dataset.csv"
+    output_path = "data/processed/nlp_text_cleaned.csv"
+
+    df = pd.read_csv(raw_path)
+
+    print(f"📄 Initial dataset shape: {df.shape}")
+
+    # Drop rows with missing text or label
+    df.dropna(subset=["text", "label"], inplace=True)
+    print(f"🧹 After dropping missing values: {df.shape}")
+
+    # Remove duplicate rows
+    df.drop_duplicates(subset=["text", "label"], inplace=True)
+    print(f"📌 After removing duplicates: {df.shape}")
+
+    # Apply text cleaning
     processor = TextPreprocessor()
     df["text"] = processor.transform(df["text"])
 
-    # Ensure the output directory exists
+    # Ensure output directory exists
     os.makedirs("data/processed", exist_ok=True)
+    df.to_csv(output_path, index=False)
 
-    df.to_csv("data/processed/nlp_text_cleaned.csv", index=False)
-    print("Text preprocessing complete and saved to 'nlp_text_cleaned.csv'")
+    print(f"✅ Preprocessing complete. Cleaned data saved to '{output_path}'")
