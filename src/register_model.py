@@ -44,7 +44,7 @@ def register_model():
     print(f"✅ Registering model from MLflow run ID: {latest_run_id}")
 
     # Register MLflow model to Azure ML directly
-    model_name = "decision-tree-model_01"
+    model_name = "Logistic_Regression_model"
     registered_model = mlflow.register_model(
         model_uri=model_uri,
         name=model_name

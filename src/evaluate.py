@@ -2,6 +2,7 @@ import pandas as pd
 import joblib
 import mlflow
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import cross_val_score
 import os
 import json
 from azure.identity import ClientSecretCredential
@@ -26,32 +27,47 @@ mlflow.set_tracking_uri(tracking_uri)
 mlflow.set_experiment("nlp-text-classification")
 
 def evaluate():
-    # Ensure files exist (model and data saved by train.py)
-    model_path = "models/sklearn_model/model.pkl"
+    model_path = "models/sklearn_model/model_1.pkl"
     x_test_path = "data/processed/X_test.csv"
     y_test_path = "data/processed/y_test.csv"
+    full_data_path = "data/processed/nlp_text_cleaned.csv"
 
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Trained model not found at {model_path}. Run train.py first.")
     if not os.path.exists(x_test_path) or not os.path.exists(y_test_path):
         raise FileNotFoundError("Test data not found. Ensure train.py has run successfully.")
+    if not os.path.exists(full_data_path):
+        raise FileNotFoundError("Full training data not found for cross-validation.")
 
     # Load model and test data
     model = joblib.load(model_path)
     X_test = pd.read_csv(x_test_path)
     y_test = pd.read_csv(y_test_path)
 
+    # Load full dataset for CV
+    full_df = pd.read_csv(full_data_path)
+    X_full = full_df["text"]
+    y_full = full_df["label"]
+
     with mlflow.start_run(nested=True):
+        # Standard test set evaluation
         preds = model.predict(X_test["text"])
         acc = accuracy_score(y_test, preds)
 
-        # Log metrics
-        mlflow.log_metric("accuracy", acc)
+        mlflow.log_metric("test_accuracy", acc)
         report = classification_report(y_test, preds)
         mlflow.log_text(report, "classification_report.txt")
 
-        print(f"✅ Evaluation complete. Accuracy: {acc:.4f}")
-        print("📋 Classification report logged to MLflow.")
+        print(f"✅ Test set accuracy: {acc:.4f}")
+        print("📋 Test classification report logged.")
+
+        # Cross-validation score
+        print("🔁 Running cross-validation (cv=5)...")
+        cv_scores = cross_val_score(model, X_full, y_full, cv=5, scoring="accuracy")
+        mlflow.log_metric("cv_mean_accuracy", cv_scores.mean())
+        print("✅ Cross-validation complete.")
+        print("CV Scores:", cv_scores)
+        print("Mean CV Accuracy:", cv_scores.mean())
 
 if __name__ == "__main__":
     evaluate()

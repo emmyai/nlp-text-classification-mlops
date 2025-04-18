@@ -39,11 +39,12 @@ def train():
     X = df["text"]
     y = df["label"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0, stratify=y)
+
 
     pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=10000, ngram_range=(1,2))),
-        ("clf", SVC(kernel='rbf'))
+        ("tfidf", TfidfVectorizer(max_features=3000, ngram_range=(1, 2), stop_words='english')),
+        ("clf", LogisticRegression())
 
     ])
 
@@ -54,12 +55,12 @@ def train():
         os.makedirs("models/sklearn_model", exist_ok=True)
 
         # Save the model artifact locally
-        joblib.dump(pipeline, "models/sklearn_model/model.pkl")
+        joblib.dump(pipeline, "models/sklearn_model/model_1.pkl")
 
         # Log model to Azure ML via MLflow
         mlflow.sklearn.log_model(pipeline, artifact_path="model")
 
-        mlflow.log_param("model_type", "DecisionTreeClassifier")
+        mlflow.log_param("model_type", "LogisticRegression")
         mlflow.log_param("test_size", 0.25)
 
         # Save test set for evaluation
